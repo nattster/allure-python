@@ -76,6 +76,7 @@ def step_status_details(result):
         message = u','.join(map(str, result.exception.args))
         message = u'{name}: {message}'.format(name=result.exception.__class__.__name__, message=message)
         trace = u'\n'.join(traceback.format_tb(result.exc_traceback)) if result.exc_traceback else None
+        message += '\n\nRerun with:\n    python manage.py behave -D ipdb \'%s\'' % str(result.location)
         return StatusDetails(message=message, trace=trace)
     elif result.status == 'undefined':
         message = u'\nYou can implement step definitions for undefined steps with these snippets:\n\n'
