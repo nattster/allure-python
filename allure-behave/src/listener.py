@@ -1,4 +1,4 @@
-from allure_commons import plugin_manager
+from allure_commons import plugin_manager, hookimpl
 from allure_commons.logger import AllureFileLogger
 from allure_commons.reporter import AllureReporter
 from allure_commons.utils import uuid4
@@ -24,6 +24,7 @@ class AllureListener(object):
         self.logger = AllureReporter()
         file_logger = AllureFileLogger(result_dir)
         plugin_manager.register(file_logger)
+        plugin_manager.register(self)
 
         self.current_group_uuid = None
         self.current_before_uuid = None
@@ -102,3 +103,11 @@ class AllureListener(object):
         status = step_status(result)
         status_details = step_status_details(result)
         self.logger.stop_step(self.current_step_uuid, stop=now(), status=status, statusDetails=status_details)
+
+    @hookimpl
+    def attach_data(self, body, name, attachment_type, extension):
+        self.logger.attach_data(uuid4(), body, name=name, attachment_type=attachment_type, extension=extension)
+
+    @hookimpl
+    def attach_file(self, source, name, attachment_type, extension):
+        self.logger.attach_file(uuid4(), source, name=name, attachment_type=attachment_type, extension=extension)
